@@ -3,29 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transmissão Ao Vivo - HiltonNet</title>
+    <title>Transmissão Ao Vivo</title>
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        body { font-family: sans-serif; background: #0f172a; color: white; text-align: center; margin: 0; padding: 10px; }
-        .card { max-width: 500px; margin: auto; background: #1e293b; border-radius: 20px; padding: 20px; margin-top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid #334155; }
-        .confronto { display: flex; justify-content: space-around; align-items: center; margin: 20px 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0f172a; color: white; text-align: center; margin: 0; padding: 10px; }
+        .card { max-width: 500px; margin: auto; background: #1e293b; border-radius: 24px; padding: 25px; margin-top: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #334155; }
+        .status { color: #ef4444; font-weight: bold; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 5px; margin-bottom: 5px; }
+        .dot { height: 8px; width: 8px; background-color: #ef4444; border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        .data-hora { font-size: 13px; color: #94a3b8; margin-bottom: 20px; }
+        .confronto { display: flex; justify-content: space-around; align-items: center; margin-bottom: 25px; }
         .time { width: 40%; }
-        .time img { width: 70px; height: 70px; object-fit: contain; margin-bottom: 10px; border-radius: 10px; }
-        .time p { font-weight: bold; margin: 0; font-size: 14px; }
-        .vs { font-size: 20px; font-weight: bold; color: #ef4444; }
-        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; background: #000; margin-top: 15px; border: 1px solid #334155; }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-        .btn-pix { background: #22c55e; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 16px; box-shadow: 0 4px 0 #166534; }
-        .btn-pix:active { transform: translateY(2px); box-shadow: 0 2px 0 #166534; }
-        #loading { margin-top: 100px; font-size: 18px; color: #94a3b8; }
+        .time img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
+        .time p { font-weight: 600; margin: 0; font-size: 15px; text-transform: uppercase; }
+        .vs { font-size: 22px; font-weight: 900; color: #f8fafc; font-style: italic; }
+        .video-container { position: relative; width: 100%; border-radius: 15px; overflow: hidden; background: #000; border: 1px solid #475569; margin-top: 10px; }
+        video { width: 100%; display: block; outline: none; }
+        .btn-pix { background: #22c55e; color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 25px; font-size: 17px; box-shadow: 0 5px 0 #166534; transition: all 0.2s; }
+        .btn-pix:active { transform: translateY(3px); box-shadow: 0 2px 0 #166534; }
+        .instrucao { font-size: 11px; color: #64748b; margin-top: 15px; line-height: 1.4; }
+        #loading { margin-top: 150px; font-size: 18px; color: #94a3b8; font-weight: 300; }
     </style>
 </head>
 <body>
 
-    <div id="loading">Buscando transmissão...</div>
+    <div id="loading">A ligar ao sinal...</div>
 
     <div class="card" id="conteudo" style="display:none;">
-        <p style="color: #ef4444; font-weight: bold; margin-bottom: 5px;">🔴 AO VIVO</p>
-        <p id="data_jogo" style="font-size: 12px; color: #94a3b8; margin-top: 0;"></p>
+        <div class="status"><span class="dot"></span> AO VIVO</div>
+        <div id="data_jogo" class="data-hora"></div>
 
         <div class="confronto">
             <div class="time">
@@ -38,50 +45,59 @@
         </div>
 
         <div class="video-container">
-            <iframe id="player_web" src="" allowfullscreen></iframe>
+            <video id="video" controls playsinline poster="https://img.freepik.com/fotos-premium/fundo-de-textura-de-grama-de-campo-de-futebol-estadio-de-futebol-fundo-de-futebol_555009-3221.jpg"></video>
         </div>
 
         <button class="btn-pix" onclick="copyPix()">APOIAR COM PIX (QUALQUER VALOR)</button>
-        <p style="font-size: 11px; color: #64748b; margin-top: 12px;">O código será copiado. Abra o app do banco e use "Pix Copia e Cola".</p>
+        <div class="instrucao">Ao clicar, o código será copiado.<br>Abra a app do seu banco e use "Pix Copia e Cola".</div>
     </div>
 
     <script>
-        // LINK DO SEU REPOSITÓRIO COM O ARQUIVO JOGO.JSON
+        // Link que lê o seu ficheiro de dados
         const linkDados = "https://raw.githubusercontent.com/cristianalvesdacosta-dot/jogo.json/main/jogo.json";
 
-        async function carregarLive() {
+        async function iniciarApp() {
             try {
-                // Adicionamos um número aleatório no final para evitar que o navegador mostre o jogo antigo (Cache)
-                const res = await fetch(linkDados + "?t=" + new Date().getTime());
-                const dados = await res.json();
+                const resposta = await fetch(linkDados + "?t=" + new Date().getTime());
+                const dados = await resposta.json();
 
                 document.getElementById('nome_casa').innerText = dados.timeCasa;
                 document.getElementById('img_casa').src = dados.logoCasa;
                 document.getElementById('nome_fora').innerText = dados.timeFora;
                 document.getElementById('img_fora').src = dados.logoFora;
                 document.getElementById('data_jogo').innerText = dados.dataHora;
-                document.getElementById('player_web').src = dados.linkVideo;
                 window.chavePix = dados.pix;
+
+                const video = document.getElementById('video');
+                const sinalURL = dados.linkVideo;
+
+                if (Hls.isSupported()) {
+                    const hls = new Hls();
+                    hls.loadSource(sinalURL);
+                    hls.attachMedia(video);
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = sinalURL;
+                }
 
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('conteudo').style.display = 'block';
-            } catch (e) {
-                document.getElementById('loading').innerText = "Nenhuma transmissão ativa agora.";
-                console.log(e);
+            } catch (erro) {
+                document.getElementById('loading').innerText = "Transmissão indisponível de momento.";
+                console.error(erro);
             }
         }
 
         function copyPix() {
-            const temp = document.createElement("textarea");
-            temp.value = window.chavePix;
-            document.body.appendChild(temp);
-            temp.select();
-            document.execCommand("copy");
-            document.body.removeChild(temp);
-            alert("Código PIX Copiado! Sucesso.");
+            const el = document.createElement('textarea');
+            el.value = window.chavePix;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            alert("Código PIX copiado com sucesso!");
         }
 
-        carregarLive();
+        iniciarApp();
     </script>
 </body>
 </html>
