@@ -1,10 +1,12 @@
 {
-  "timeCasa": "REMO",
+  "timeCasa": "REMO ",
   "logoCasa": "https://ibb.co/ccYL0G1d",
   "timeFora": "GRÊMIO ",
   "logoFora": "https://ibb.co/b5Nm7c7H",
-  "dataHora": "05/04 às ",
+  "dataHora": "05/04 às 20:00",
   "linkVideo": "",
   "pix": "",
-  "mensagemIncentivo": "⚽ O sinal depende do seu apoio! Colabore via PIX para manter a live no ar."
+  "mensagemIncentivo": "⚽ O sinal depende do seu apoio! Colabore via PIX para manter a live no ar.",
+  "urlBanner": "",
+  "linkParceiro": ""
 }
