@@ -3,101 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transmissão Ao Vivo</title>
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <title>LiveGol | HiltonNet</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0f172a; color: white; text-align: center; margin: 0; padding: 10px; }
-        .card { max-width: 500px; margin: auto; background: #1e293b; border-radius: 24px; padding: 25px; margin-top: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #334155; }
-        .status { color: #ef4444; font-weight: bold; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 5px; margin-bottom: 5px; }
-        .dot { height: 8px; width: 8px; background-color: #ef4444; border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-        .data-hora { font-size: 13px; color: #94a3b8; margin-bottom: 20px; }
-        .confronto { display: flex; justify-content: space-around; align-items: center; margin-bottom: 25px; }
-        .time { width: 40%; }
-        .time img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
-        .time p { font-weight: 600; margin: 0; font-size: 15px; text-transform: uppercase; }
-        .vs { font-size: 22px; font-weight: 900; color: #f8fafc; font-style: italic; }
-        .video-container { position: relative; width: 100%; border-radius: 15px; overflow: hidden; background: #000; border: 1px solid #475569; margin-top: 10px; }
-        video { width: 100%; display: block; outline: none; }
-        .btn-pix { background: #22c55e; color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 25px; font-size: 17px; box-shadow: 0 5px 0 #166534; transition: all 0.2s; }
-        .btn-pix:active { transform: translateY(3px); box-shadow: 0 2px 0 #166534; }
-        .instrucao { font-size: 11px; color: #64748b; margin-top: 15px; line-height: 1.4; }
-        #loading { margin-top: 150px; font-size: 18px; color: #94a3b8; font-weight: 300; }
+        :root {
+            --verde-neon: #22c55e;
+            --fundo-dark: #0a0a0a;
+            --card-dark: #171717;
+            --texto-cinza: #a3a3a3;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--fundo-dark); 
+            color: white; 
+            margin: 0; 
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: var(--fundo-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER COM LOGO LIVEGOL */
+        .header {
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(to bottom, #111, var(--fundo-dark));
+            border-bottom: 1px solid #262626;
+        }
+
+        .logo-livegol {
+            height: 45px;
+            filter: drop-shadow(0 0 5px rgba(34, 197, 94, 0.3));
+        }
+
+        /* AREA DO VIDEO */
+        .video-box {
+            width: 100%;
+            background: #000;
+            line-height: 0;
+            border-bottom: 2px solid var(--verde-neon);
+        }
+
+        video { width: 100%; outline: none; }
+
+        /* CARD DE PLACAR */
+        .placar-container {
+            padding: 25px 15px;
+            background: var(--card-dark);
+            margin: 15px;
+            border-radius: 15px;
+            border: 1px solid #262626;
+        }
+
+        .times-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .time-bloco { width: 35%; text-align: center; }
+        .time-bloco img { width: 65px; height: 65px; object-fit: contain; margin-bottom: 10px; }
+        .time-bloco p { font-weight: bold; font-size: 14px; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
+
+        .vs-bloco { text-align: center; }
+        .vs-texto { font-size: 24px; font-weight: 900; color: var(--verde-neon); font-style: italic; }
+        .badge-live { 
+            background: var(--verde-neon); 
+            color: black; 
+            font-size: 10px; 
+            font-weight: 900; 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            margin-top: 5px;
+            animation: blink 1.2s infinite;
+        }
+
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* INFO DO JOGO */
+        .game-details { padding: 0 20px; text-align: left; }
+        .game-details h1 { font-size: 18px; margin: 0; color: white; }
+        .game-details p { font-size: 13px; color: var(--texto-cinza); margin: 5px 0 0 0; }
+
+        /* SEÇÃO PIX PROFISSIONAL */
+        .pix-area {
+            margin-top: auto;
+            padding: 20px;
+            background: #111;
+            border-top: 1px solid #262626;
+        }
+
+        .pix-label { font-size: 12px; color: var(--texto-cinza); text-transform: uppercase; margin-bottom: 10px; display: block; }
+        
+        .pix-box {
+            background: #1e1e1e;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            color: #888;
+            border: 1px dashed #444;
+            margin-bottom: 15px;
+            word-break: break-all;
+        }
+
+        .btn-pix {
+            background: var(--verde-neon);
+            color: black;
+            border: none;
+            padding: 18px;
+            width: 100%;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+            transition: 0.2s;
+        }
+
+        .btn-pix:active { transform: scale(0.98); }
+
+        #loading { display: flex; align-items: center; justify-content: center; height: 100vh; color: var(--verde-neon); font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="loading">A ligar ao sinal...</div>
+    <div id="loading">CARREGANDO LIVEGOL...</div>
 
-    <div class="card" id="conteudo" style="display:none;">
-        <div class="status"><span class="dot"></span> AO VIVO</div>
-        <div id="data_jogo" class="data-hora"></div>
+    <div class="container" id="conteudo" style="display:none;">
+        <header class="header">
+            <img src="https://img001.prntscr.com/file/img001/Pj6A2C59T3-xYk_E-h_6hA.png" class="logo-livegol" alt="LiveGol">
+        </header>
 
-        <div class="confronto">
-            <div class="time">
-                <img id="img_casa" src=""><p id="nome_casa"></p>
-            </div>
-            <div class="vs">VS</div>
-            <div class="time">
-                <img id="img_fora" src=""><p id="nome_fora"></p>
+        <div class="video-box">
+            <video id="video" controls playsinline></video>
+        </div>
+
+        <div class="placar-container">
+            <div class="times-row">
+                <div class="time-bloco">
+                    <img id="img_casa" src=""><p id="nome_casa"></p>
+                </div>
+                <div class="vs-bloco">
+                    <div class="vs-texto">VS</div>
+                    <div class="badge-live">AO VIVO</div>
+                </div>
+                <div class="time-bloco">
+                    <img id="img_fora" src=""><p id="nome_fora"></p>
+                </div>
             </div>
         </div>
 
-        <div class="video-container">
-            <video id="video" controls playsinline poster="https://img.freepik.com/fotos-premium/fundo-de-textura-de-grama-de-campo-de-futebol-estadio-de-futebol-fundo-de-futebol_555009-3221.jpg"></video>
+        <div class="game-details">
+            <h1 id="titulo_jogo">NOME DO JOGO</h1>
+            <p id="data_jogo">Horário da Transmissão</p>
         </div>
 
-        <button class="btn-pix" onclick="copyPix()">APOIAR COM PIX (QUALQUER VALOR)</button>
-        <div class="instrucao">Ao clicar, o código será copiado.<br>Abra a app do seu banco e use "Pix Copia e Cola".</div>
+        <div class="pix-area">
+            <span class="pix-label">Apoie a transmissão via PIX</span>
+            <div class="pix-box" id="pix_text">Carregando chave...</div>
+            <button class="btn-pix" onclick="copiarPix()">COPIAR PIX COPIA E COLA</button>
+        </div>
     </div>
 
     <script>
-        // Link que lê o seu ficheiro de dados
-        const linkDados = "https://raw.githubusercontent.com/cristianalvesdacosta-dot/jogo.json/main/jogo.json";
+        const jsonUrl = "https://raw.githubusercontent.com/cristianalvesdacosta-dot/jogo.json/main/jogo.json";
 
-        async function iniciarApp() {
+        async function init() {
             try {
-                const resposta = await fetch(linkDados + "?t=" + new Date().getTime());
-                const dados = await resposta.json();
+                const res = await fetch(jsonUrl + "?v=" + Date.now());
+                const data = await res.json();
 
-                document.getElementById('nome_casa').innerText = dados.timeCasa;
-                document.getElementById('img_casa').src = dados.logoCasa;
-                document.getElementById('nome_fora').innerText = dados.timeFora;
-                document.getElementById('img_fora').src = dados.logoFora;
-                document.getElementById('data_jogo').innerText = dados.dataHora;
-                window.chavePix = dados.pix;
+                document.getElementById('nome_casa').innerText = data.timeCasa;
+                document.getElementById('img_casa').src = data.logoCasa;
+                document.getElementById('nome_fora').innerText = data.timeFora;
+                document.getElementById('img_fora').src = data.logoFora;
+                document.getElementById('titulo_jogo').innerText = data.timeCasa + " x " + data.timeFora;
+                document.getElementById('data_jogo').innerText = data.dataHora;
+                document.getElementById('pix_text').innerText = data.pix;
+                window.chavePix = data.pix;
 
                 const video = document.getElementById('video');
-                const sinalURL = dados.linkVideo;
-
                 if (Hls.isSupported()) {
                     const hls = new Hls();
-                    hls.loadSource(sinalURL);
+                    hls.loadSource(data.linkVideo);
                     hls.attachMedia(video);
                 } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                    video.src = sinalURL;
+                    video.src = data.linkVideo;
                 }
 
                 document.getElementById('loading').style.display = 'none';
-                document.getElementById('conteudo').style.display = 'block';
-            } catch (erro) {
-                document.getElementById('loading').innerText = "Transmissão indisponível de momento.";
-                console.error(erro);
+                document.getElementById('conteudo').style.display = 'flex';
+            } catch (e) {
+                document.getElementById('loading').innerText = "ERRO AO CARREGAR SINAL.";
             }
         }
 
-        function copyPix() {
-            const el = document.createElement('textarea');
-            el.value = window.chavePix;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            alert("Código PIX copiado com sucesso!");
+        function copiarPix() {
+            navigator.clipboard.writeText(window.chavePix);
+            alert("Chave PIX copiada! Obrigado pelo apoio.");
         }
 
-        iniciarApp();
+        init();
     </script>
 </body>
 </html>
