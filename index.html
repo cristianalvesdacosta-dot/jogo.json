@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transmissão Ao Vivo - HiltonNet</title>
+    <style>
+        body { font-family: sans-serif; background: #0f172a; color: white; text-align: center; margin: 0; padding: 10px; }
+        .card { max-width: 500px; margin: auto; background: #1e293b; border-radius: 20px; padding: 20px; margin-top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid #334155; }
+        .confronto { display: flex; justify-content: space-around; align-items: center; margin: 20px 0; }
+        .time { width: 40%; }
+        .time img { width: 70px; height: 70px; object-fit: contain; margin-bottom: 10px; border-radius: 10px; }
+        .time p { font-weight: bold; margin: 0; font-size: 14px; }
+        .vs { font-size: 20px; font-weight: bold; color: #ef4444; }
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; background: #000; margin-top: 15px; border: 1px solid #334155; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .btn-pix { background: #22c55e; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 16px; box-shadow: 0 4px 0 #166534; }
+        .btn-pix:active { transform: translateY(2px); box-shadow: 0 2px 0 #166534; }
+        #loading { margin-top: 100px; font-size: 18px; color: #94a3b8; }
+    </style>
+</head>
+<body>
+
+    <div id="loading">Buscando transmissão...</div>
+
+    <div class="card" id="conteudo" style="display:none;">
+        <p style="color: #ef4444; font-weight: bold; margin-bottom: 5px;">🔴 AO VIVO</p>
+        <p id="data_jogo" style="font-size: 12px; color: #94a3b8; margin-top: 0;"></p>
+
+        <div class="confronto">
+            <div class="time">
+                <img id="img_casa" src=""><p id="nome_casa"></p>
+            </div>
+            <div class="vs">VS</div>
+            <div class="time">
+                <img id="img_fora" src=""><p id="nome_fora"></p>
+            </div>
+        </div>
+
+        <div class="video-container">
+            <iframe id="player_web" src="" allowfullscreen></iframe>
+        </div>
+
+        <button class="btn-pix" onclick="copyPix()">APOIAR COM PIX (QUALQUER VALOR)</button>
+        <p style="font-size: 11px; color: #64748b; margin-top: 12px;">O código será copiado. Abra o app do banco e use "Pix Copia e Cola".</p>
+    </div>
+
+    <script>
+        // LINK DO SEU REPOSITÓRIO COM O ARQUIVO JOGO.JSON
+        const linkDados = "https://raw.githubusercontent.com/cristianalvesdacosta-dot/jogo.json/main/jogo.json";
+
+        async function carregarLive() {
+            try {
+                // Adicionamos um número aleatório no final para evitar que o navegador mostre o jogo antigo (Cache)
+                const res = await fetch(linkDados + "?t=" + new Date().getTime());
+                const dados = await res.json();
+
+                document.getElementById('nome_casa').innerText = dados.timeCasa;
+                document.getElementById('img_casa').src = dados.logoCasa;
+                document.getElementById('nome_fora').innerText = dados.timeFora;
+                document.getElementById('img_fora').src = dados.logoFora;
+                document.getElementById('data_jogo').innerText = dados.dataHora;
+                document.getElementById('player_web').src = dados.linkVideo;
+                window.chavePix = dados.pix;
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('conteudo').style.display = 'block';
+            } catch (e) {
+                document.getElementById('loading').innerText = "Nenhuma transmissão ativa agora.";
+                console.log(e);
+            }
+        }
+
+        function copyPix() {
+            const temp = document.createElement("textarea");
+            temp.value = window.chavePix;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand("copy");
+            document.body.removeChild(temp);
+            alert("Código PIX Copiado! Sucesso.");
+        }
+
+        carregarLive();
+    </script>
+</body>
+</html>
