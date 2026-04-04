@@ -3,47 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LiveGol | Transmissão Digital</title>
+    <title>LiveGol | Ao Vivo</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         :root { --verde: #22c55e; --fundo: #0a0a0a; --card: #171717; }
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--fundo); color: white; margin: 0; padding: 0; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--fundo); color: white; margin: 0; padding: 0; }
         .container { width: 100%; max-width: 450px; margin: auto; min-height: 100vh; display: flex; flex-direction: column; background: #000; }
         
-        /* Header */
-        .header-banner { padding: 15px; text-align: center; background: #111; border-bottom: 2px solid var(--verde); display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .logo-texto { font-size: 24px; font-weight: 900; font-style: italic; margin: 0; letter-spacing: -1px; }
+        /* Cabeçalho */
+        .header-banner { padding: 15px; text-align: center; background: #111; border-bottom: 2px solid var(--verde); display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .logo-texto { font-size: 26px; font-weight: 900; font-style: italic; margin: 0; }
         .cor-verde { color: var(--verde); }
 
-        /* Player */
-        .video-box { width: 100%; background: #000; aspect-ratio: 16/9; position: relative; border-bottom: 1px solid #222; }
-        video { width: 100%; height: 100%; display: block; cursor: pointer; }
+        /* Area do Video */
+        .video-box { width: 100%; background: #000; aspect-ratio: 16/9; border-bottom: 1px solid #222; }
+        video { width: 100%; height: 100%; display: block; }
 
-        /* Informações */
-        .apoio-box { padding: 12px; background: rgba(34, 197, 94, 0.1); margin: 10px 15px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.3); text-align: center; font-size: 13px; color: #ddd; }
+        /* Mensagem e Placar */
+        .apoio-box { padding: 12px; background: rgba(34, 197, 94, 0.1); margin: 10px 15px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.3); text-align: center; font-size: 13px; }
 
-        .placar { padding: 20px 10px; background: var(--card); margin: 5px 15px; border-radius: 12px; border: 1px solid #262626; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .placar { padding: 15px 10px; background: var(--card); margin: 5px 15px; border-radius: 12px; border: 1px solid #262626; }
         .times-row { display: flex; justify-content: space-around; align-items: center; }
         .time-bloco { width: 35%; text-align: center; }
-        .time-bloco img { width: 55px; height: 55px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
-        .time-bloco p { font-weight: bold; font-size: 12px; margin: 8px 0 0 0; text-transform: uppercase; color: #fff; }
-        
-        .vs-box { text-align: center; }
-        .vs-text { color: var(--verde); font-weight: 900; font-size: 20px; }
-        .live-tag { background: var(--verde); color: black; font-size: 10px; font-weight: 900; padding: 3px 7px; border-radius: 4px; margin-top: 5px; animation: blink 1.5s infinite; }
+        .time-bloco img { width: 50px; height: 50px; object-fit: contain; }
+        .time-bloco p { font-weight: bold; font-size: 12px; margin: 5px 0 0 0; text-transform: uppercase; }
+        .vs-text { color: var(--verde); font-weight: 900; font-size: 18px; }
+        .live-tag { background: var(--verde); color: black; font-size: 9px; font-weight: 900; padding: 2px 5px; border-radius: 3px; margin-top: 4px; text-align: center; display: inline-block; }
 
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
-        /* Ads */
-        .ads-area { padding: 0 15px; margin: 15px 0; display: none; }
-        .ads-box { width: 100%; background: #111; border: 1px dashed #444; border-radius: 10px; overflow: hidden; transition: 0.3s; }
-        .ads-box:hover { border-color: var(--verde); }
+        /* Área de Banner (Ads) */
+        .ads-area { padding: 0 15px; margin: 10px 0; display: none; }
+        .ads-box { width: 100%; background: #111; border: 1px dashed #444; border-radius: 10px; overflow: hidden; text-align: center; }
         .ads-box img { width: 100%; display: block; }
 
-        /* Footer/Pix */
+        /* Rodapé com PIX */
         .pix-area { margin-top: auto; padding: 20px; background: #111; border-top: 1px solid #262626; }
-        .btn-pix { background: var(--verde); color: black; border: none; padding: 18px; width: 100%; border-radius: 10px; font-weight: 900; font-size: 16px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
-        .btn-pix:active { transform: scale(0.98); }
+        .btn-pix { background: var(--verde); color: black; border: none; padding: 18px; width: 100%; border-radius: 10px; font-weight: 900; font-size: 16px; cursor: pointer; transition: 0.2s; }
+        .btn-pix:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
@@ -58,31 +53,31 @@
     </div>
     
     <div class="apoio-box">
-        <p id="texto_incentivo">Carregando informações...</p>
+        <p id="texto_incentivo">Buscando sinal da partida...</p>
     </div>
 
     <div class="placar">
         <div class="times-row">
             <div class="time-bloco">
-                <img id="img_casa" src="https://via.placeholder.com/50">
+                <img id="img_casa" src="">
                 <p id="nome_casa">CASA</p>
             </div>
-            <div class="vs-box">
+            <div style="text-align: center;">
                 <div class="vs-text">VS</div>
                 <div class="live-tag">AO VIVO</div>
             </div>
             <div class="time-bloco">
-                <img id="img_fora" src="https://via.placeholder.com/50">
+                <img id="img_fora" src="">
                 <p id="nome_fora">FORA</p>
             </div>
         </div>
-        <div id="data_hora_jogo" style="text-align:center; font-size:12px; color:#aaa; margin-top:15px; font-weight: bold;"></div>
+        <div id="data_hora_jogo" style="text-align:center; font-size:11px; color:#888; margin-top:10px;"></div>
     </div>
 
     <div id="container_ads" class="ads-area">
         <div class="ads-box">
             <a id="link_ads" href="#" target="_blank">
-                <img id="img_ads" src="" alt="Publicidade">
+                <img id="img_ads" src="" alt="Parceiro">
             </a>
         </div>
     </div>
@@ -96,79 +91,69 @@
     // Link do seu JSON no GitHub
     const JSON_URL = "https://raw.githubusercontent.com/cristianalvesdacosta-dot/jogo.json/main/jogo.json";
 
-    async function carregarApp() {
+    async function carregar() {
         try {
-            const response = await fetch(`${JSON_URL}?v=${Date.now()}`);
-            const data = await response.json();
+            // Fetch com Cache Buster para atualizar sempre
+            const res = await fetch(`${JSON_URL}?v=${Date.now()}`);
+            const d = await res.json();
             
-            // Preencher Dados da Interface
-            document.getElementById('nome_casa').innerText = data.timeCasa || "Time Casa";
-            document.getElementById('img_casa').src = data.logoCasa || "";
-            document.getElementById('nome_fora').innerText = data.timeFora || "Time Fora";
-            document.getElementById('img_fora').src = data.logoFora || "";
-            document.getElementById('data_hora_jogo').innerText = data.dataHora || "";
-            document.getElementById('texto_incentivo').innerText = data.mensagemIncentivo || "";
-            window.chavePix = data.pix;
+            // Preenche os dados do seu gerador
+            document.getElementById('nome_casa').innerText = d.timeCasa;
+            document.getElementById('img_casa').src = d.logoCasa;
+            document.getElementById('nome_fora').innerText = d.timeFora;
+            document.getElementById('img_fora').src = d.logoFora;
+            document.getElementById('data_hora_jogo').innerText = d.dataHora;
+            document.getElementById('texto_incentivo').innerText = d.mensagemIncentivo;
+            window.chavePix = d.pix;
 
-            // Lógica de Banner/Ads
-            if (data.urlBanner && data.urlBanner.trim() !== "") {
+            // Banner de Parceria
+            if (d.urlBanner && d.urlBanner !== "") {
                 document.getElementById('container_ads').style.display = 'block';
-                document.getElementById('img_ads').src = data.urlBanner;
-                document.getElementById('link_ads').href = data.linkParceiro || "#";
+                document.getElementById('img_ads').src = d.urlBanner;
+                document.getElementById('link_ads').href = d.linkParceiro || "#";
             }
 
-            // --- LÓGICA DE VÍDEO (Bypass de Segurança) ---
-            let finalVideoUrl = data.linkVideo;
-
-            // Se for link HTTP, usamos o Proxy AllOrigins para permitir no GitHub HTTPS
-            if (finalVideoUrl.startsWith("http://")) {
-                console.log("Aplicando Proxy de Segurança...");
-                finalVideoUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(finalVideoUrl)}`;
+            // --- TRATAMENTO DO VÍDEO (BYPASS) ---
+            let link = d.linkVideo;
+            
+            // Se o link for HTTP (comum em IPTV), usamos o Proxy para não travar no GitHub HTTPS
+            if (link.startsWith("http://")) {
+                link = "https://api.allorigins.win/raw?url=" + encodeURIComponent(link);
             }
 
             const video = document.getElementById('video');
             
             if (Hls.isSupported()) {
                 const hls = new Hls({
-                    xhrSetup: function (xhr, url) {
-                        xhr.withCredentials = false; // Importante para evitar erro de CORS
+                    xhrSetup: function (xhr) {
+                        xhr.withCredentials = false;
                     }
                 });
-                hls.loadSource(finalVideoUrl);
+                hls.loadSource(link);
                 hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    console.log("Sinal carregado com sucesso!");
-                });
                 
-                hls.on(Hls.Events.ERROR, function (event, data) {
-                    if (data.fatal) {
-                        console.error("Erro fatal no HLS, tentando recuperar...");
-                        hls.recoverMediaError();
-                    }
-                });
+                // Play automático (com mudo para o navegador permitir)
+                video.muted = true;
+                video.play().catch(() => console.log("Play automático aguardando interação."));
 
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                // Suporte nativo para Safari (iPhone)
-                video.src = finalVideoUrl;
+                // Suporte para iPhone/Safari
+                video.src = link;
             }
 
-        } catch (error) {
-            console.error("Erro ao carregar o JSON:", error);
-            document.getElementById('texto_incentivo').innerText = "Erro ao carregar sinal. Tente novamente.";
+        } catch (e) {
+            console.error("Erro ao carregar dados:", e);
         }
     }
 
     function copiarPix() { 
         if (window.chavePix) {
             navigator.clipboard.writeText(window.chavePix); 
-            alert("✅ Chave PIX copiada!"); 
-        } else {
-            alert("Chave PIX não configurada.");
+            alert("PIX Copiado com sucesso!"); 
         }
     }
 
-    // Iniciar
-    carregarApp();
+    carregar();
 </script>
 
 </body>
