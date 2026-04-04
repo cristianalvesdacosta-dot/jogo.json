@@ -3,40 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LiveGol | Ao Vivo</title>
+    <title>LiveGol | Player Profissional</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dplayer@latest/dist/DPlayer.min.js"></script>
     <style>
-        :root { --verde: #22c55e; --fundo: #0a0a0a; --card: #171717; }
+        :root { --verde: #22c55e; --fundo: #050505; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--fundo); color: white; margin: 0; padding: 0; }
-        .container { width: 100%; max-width: 450px; margin: auto; min-height: 100vh; display: flex; flex-direction: column; background: #000; }
+        .container { width: 100%; max-width: 450px; margin: auto; min-height: 100vh; display: flex; flex-direction: column; }
         
-        /* Topo */
+        /* Estilo do Player (Simulando VLC) */
+        #dplayer { width: 100%; aspect-ratio: 16/9; background: #000; }
+
         .header { padding: 15px; text-align: center; background: #111; border-bottom: 2px solid var(--verde); }
-        .logo { font-size: 26px; font-weight: 900; font-style: italic; margin: 0; }
+        .logo { font-size: 24px; font-weight: 900; font-style: italic; margin: 0; }
         .verde { color: var(--verde); }
 
-        /* Video */
-        .video-box { width: 100%; background: #000; aspect-ratio: 16/9; position: relative; }
-        video { width: 100%; height: 100%; display: block; background: #000; }
-        #status { position: absolute; bottom: 10px; left: 10px; font-size: 10px; color: #666; }
-
-        /* Info e Placar */
-        .apoio { padding: 12px; background: rgba(34, 197, 94, 0.1); margin: 10px 15px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.3); text-align: center; font-size: 13px; }
-        .placar { padding: 15px 10px; background: var(--card); margin: 5px 15px; border-radius: 12px; border: 1px solid #262626; }
+        .placar { padding: 15px; background: #111; margin: 10px; border-radius: 12px; border: 1px solid #222; }
         .times { display: flex; justify-content: space-around; align-items: center; }
-        .time { width: 35%; text-align: center; }
-        .time img { width: 50px; height: 50px; object-fit: contain; }
-        .time p { font-weight: bold; font-size: 12px; margin: 5px 0 0 0; text-transform: uppercase; }
-        .vs { color: var(--verde); font-weight: 900; }
-        .ao-vivo { background: var(--verde); color: #000; font-size: 9px; font-weight: 900; padding: 2px 5px; border-radius: 3px; }
+        .time { text-align: center; width: 30%; }
+        .time img { width: 45px; height: 45px; object-fit: contain; }
+        .time p { font-size: 11px; font-weight: bold; margin-top: 5px; text-transform: uppercase; }
+        
+        .vs-box { text-align: center; }
+        .live-tag { background: var(--verde); color: #000; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 3px; }
 
-        /* Banner Ads */
-        .ads { padding: 0 15px; margin: 10px 0; display: none; }
-        .ads-box { width: 100%; background: #111; border: 1px dashed #444; border-radius: 10px; overflow: hidden; }
-        .ads-box img { width: 100%; display: block; }
-
-        /* Pix */
-        .footer { margin-top: auto; padding: 20px; background: #111; }
+        .footer { margin-top: auto; padding: 20px; }
         .btn-pix { background: var(--verde); color: #000; border: none; padding: 18px; width: 100%; border-radius: 10px; font-weight: 900; font-size: 16px; cursor: pointer; }
     </style>
 </head>
@@ -45,86 +36,62 @@
 <div class="container">
     <header class="header"><h1 class="logo">⚽ LIVE<span class="verde">GOL</span></h1></header>
 
-    <div class="video-box">
-        <video id="video" controls playsinline poster="https://via.placeholder.com/640x360/000000/FFFFFF?text=Conectando..."></video>
-        <div id="status">Aguardando sinal...</div>
-    </div>
+    <div id="dplayer"></div>
     
-    <div class="apoio"><p id="msg_apoio"></p></div>
+    <div id="msg" style="padding:10px; font-size:12px; text-align:center; color:var(--verde);">Conectando ao sinal...</div>
 
     <div class="placar">
         <div class="times">
             <div class="time"><img id="img_c"><p id="txt_c"></p></div>
-            <div style="text-align:center;"><div class="vs">VS</div><div class="ao-vivo">AO VIVO</div></div>
+            <div class="vs-box"><div style="color:var(--verde); font-weight:900;">VS</div><div class="live-tag">AO VIVO</div></div>
             <div class="time"><img id="img_f"><p id="txt_f"></p></div>
         </div>
-        <div id="info_jogo" style="text-align:center; font-size:11px; color:#888; margin-top:10px;"></div>
-    </div>
-
-    <div id="area_ads" class="ads">
-        <div class="ads-box"><a id="link_a" href="#" target="_blank"><img id="img_a"></a></div>
     </div>
 
     <div class="footer"><button class="btn-pix" onclick="copiarPix()">APOIAR VIA PIX</button></div>
 </div>
 
 <script>
-    const URL_JSON = "https://raw.githubusercontent.com/cristianalvesdacosta-dot/jogo.json/main/jogo.json";
+    const JSON_URL = "https://raw.githubusercontent.com/cristianalvesdacosta-dot/jogo.json/main/jogo.json";
 
     async function carregar() {
         try {
-            const res = await fetch(`${URL_JSON}?v=${Date.now()}`);
+            const res = await fetch(`${JSON_URL}?v=${Date.now()}`);
             const d = await res.json();
             
             document.getElementById('txt_c').innerText = d.timeCasa;
             document.getElementById('img_c').src = d.logoCasa;
             document.getElementById('txt_f').innerText = d.timeFora;
             document.getElementById('img_f').src = d.logoFora;
-            document.getElementById('info_jogo').innerText = d.dataHora;
-            document.getElementById('msg_apoio').innerText = d.mensagemIncentivo;
             window.chavePix = d.pix;
 
-            if (d.urlBanner && d.urlBanner !== "") {
-                document.getElementById('area_ads').style.display = 'block';
-                document.getElementById('img_a').src = d.urlBanner;
-                document.getElementById('link_a').href = d.linkParceiro || "#";
-            }
-
-            const video = document.getElementById('video');
-            const status = document.getElementById('status');
-            
-            // --- SISTEMA DE BYPASS DE BLOQUEIO ---
-            // Usamos o Proxy AllOrigins para esconder que o pedido vem do GitHub
-            let urlFinal = "https://api.allorigins.win/raw?url=" + encodeURIComponent(d.linkVideo);
-
-            if (Hls.isSupported()) {
-                const hls = new Hls({
-                    xhrSetup: function(xhr) {
-                        xhr.withCredentials = false;
-                    },
-                    manifestLoadingMaxRetry: 5,
-                    levelLoadingMaxRetry: 5
-                });
-
-                hls.loadSource(urlFinal);
-                hls.attachMedia(video);
-                
-                hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    status.innerText = "Sinal Online ✅";
-                    video.muted = true; // Necessário para Chrome/Android dar play
-                    video.play().catch(() => status.innerText = "Clique no Play para iniciar");
-                });
-
-                hls.on(Hls.Events.ERROR, function(event, data) {
-                    if (data.fatal) {
-                        status.innerText = "Reconectando...";
-                        hls.recoverMediaError();
+            // CONFIGURAÇÃO DO PLAYER (ESTILO VLC)
+            const dp = new DPlayer({
+                container: document.getElementById('dplayer'),
+                live: true,
+                autoplay: true,
+                theme: '#22c55e',
+                video: {
+                    url: "https://api.allorigins.win/raw?url=" + encodeURIComponent(d.linkVideo),
+                    type: 'hls',
+                },
+                pluginOptions: {
+                    hls: {
+                        xhrSetup: function (xhr) {
+                            xhr.withCredentials = false;
+                        }
                     }
-                });
+                }
+            });
 
-            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = urlFinal;
-            }
+            dp.on('canplay', () => {
+                document.getElementById('msg').innerText = "Sinal Estabilizado ✅";
+                dp.play();
+            });
+
+            dp.on('error', () => {
+                document.getElementById('msg').innerText = "Erro: O servidor bloqueou o acesso do site. ❌";
+            });
 
         } catch (e) {
             console.error(e);
@@ -132,10 +99,8 @@
     }
 
     function copiarPix() { 
-        if(window.chavePix) {
-            navigator.clipboard.writeText(window.chavePix); 
-            alert("PIX Copiado!"); 
-        }
+        navigator.clipboard.writeText(window.chavePix); 
+        alert("PIX Copiado!"); 
     }
 
     carregar();
