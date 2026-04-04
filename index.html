@@ -3,67 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LiveGol | Oficial</title>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <title>Gerador LiveGol | Simplificado</title>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; text-align: center; }
-        .container { width: 100%; max-width: 450px; margin: auto; }
-        .header { padding: 15px; border-bottom: 2px solid #22c55e; background: #111; font-style: italic; }
-        video { width: 100%; aspect-ratio: 16/9; background: #111; display: block; }
-        .placar { background: #111; margin: 15px; padding: 20px; border-radius: 12px; border: 1px solid #222; }
-        .times { display: flex; justify-content: space-around; align-items: center; }
-        .time img { width: 60px; height: 60px; object-fit: contain; }
-        .vs { color: #22c55e; font-weight: 900; font-size: 20px; }
-        .btn-pix { background: #22c55e; color: #000; border: none; padding: 18px; width: 90%; border-radius: 10px; font-weight: 900; font-size: 16px; margin-top: 20px; cursor: pointer; }
+        body { font-family: sans-serif; background: #0a0a0a; color: white; padding: 20px; text-align: center; }
+        .box { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #22c55e; max-width: 500px; margin: auto; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: #22c55e; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        #output { margin-top: 20px; background: #000; padding: 15px; border-radius: 8px; color: #22c55e; font-family: monospace; font-size: 12px; text-align: left; white-space: pre-wrap; display: none; border: 1px solid #222; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header"><h1>⚽ LIVE<span style="color:#22c55e">GOL</span></h1></header>
-        <video id="video" controls autoplay playsinline></video>
-        <div id="status" style="padding:10px; font-size:12px; color:#888;">Carregando...</div>
-        <div class="placar">
-            <div class="times">
-                <div><img id="l_c"><p id="n_c">---</p></div>
-                <div><div class="vs">VS</div></div>
-                <div><img id="l_f"><p id="n_f">---</p></div>
-            </div>
-        </div>
-        <button class="btn-pix" onclick="navigator.clipboard.writeText(window.px);alert('Copiado!')">APOIAR VIA PIX</button>
-    </div>
+
+<div class="box">
+    <h2>🚀 GERADOR DE JOGO</h2>
+    <input type="text" id="casa" placeholder="Nome Time Casa (Ex: Remo)">
+    <input type="text" id="l_casa" placeholder="Link Logo Casa (.png)">
+    <input type="text" id="fora" placeholder="Nome Time Fora (Ex: Paysandu)">
+    <input type="text" id="l_fora" placeholder="Link Logo Fora (.png)">
+    <input type="text" id="video" placeholder="Link do Vídeo (M3U8)">
+    <input type="text" id="pix" placeholder="Sua Chave PIX">
+    
+    <button onclick="gerar()">GERAR E COPIAR JSON</button>
+    <div id="output"></div>
+</div>
 
 <script>
-    async function carregar() {
-        const url = "https://raw.githubusercontent.com/cristianalvesdacosta-dot/jogo.json/main/jogo.json?v=" + Date.now();
-        try {
-            const r = await fetch(url);
-            const d = await r.json();
-            
-            document.getElementById('n_c').innerText = d.timeCasa;
-            document.getElementById('l_c').src = d.logoCasa;
-            document.getElementById('n_f').innerText = d.timeFora;
-            document.getElementById('l_f').src = d.logoFora;
-            window.px = d.pix;
+    function gerar() {
+        const dados = {
+            "timeCasa": document.getElementById('casa').value || "Time Casa",
+            "logoCasa": document.getElementById('l_casa').value || "https://via.placeholder.com/150",
+            "timeFora": document.getElementById('fora').value || "Time Fora",
+            "logoFora": document.getElementById('l_fora').value || "https://via.placeholder.com/150",
+            "linkVideo": document.getElementById('video').value.trim(),
+            "pix": document.getElementById('pix').value || "Chave Pix"
+        };
 
-            let sinal = d.linkVideo;
-            // Bypass para o GitHub
-            const proxy = "https://api.allorigins.win/raw?url=" + encodeURIComponent(sinal);
-            
-            const v = document.getElementById('video');
-            if (Hls.isSupported()) {
-                const hls = new Hls();
-                hls.loadSource(proxy);
-                hls.attachMedia(v);
-                hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    document.getElementById('status').innerText = "Sinal Online ✅";
-                    v.play();
-                });
-            }
-        } catch (e) {
-            document.getElementById('status').innerText = "Erro no arquivo jogo.json! Verifique as vírgulas.";
-        }
+        const resultado = JSON.stringify(dados, null, 2);
+        document.getElementById('output').innerText = resultado;
+        document.getElementById('output').style.display = 'block';
+
+        navigator.clipboard.writeText(resultado).then(() => {
+            alert("JSON copiado! Agora cole no seu arquivo jogo.json e salve.");
+        });
     }
-    carregar();
 </script>
+
 </body>
 </html>
