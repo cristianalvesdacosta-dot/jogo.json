@@ -3,50 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador LiveGol | Simplificado</title>
+    <title>Gerador LiveGol | Oficial</title>
     <style>
-        body { font-family: sans-serif; background: #0a0a0a; color: white; padding: 20px; text-align: center; }
-        .box { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #22c55e; max-width: 500px; margin: auto; }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; background: #22c55e; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        #output { margin-top: 20px; background: #000; padding: 15px; border-radius: 8px; color: #22c55e; font-family: monospace; font-size: 12px; text-align: left; white-space: pre-wrap; display: none; border: 1px solid #222; }
+        :root { --verde: #22c55e; --fundo: #0a0a0a; --input: #1a1a1a; }
+        body { font-family: sans-serif; background: var(--fundo); color: white; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .box { background: #111; padding: 20px; border-radius: 12px; border: 1px solid var(--verde); width: 100%; max-width: 500px; }
+        h2 { color: var(--verde); text-align: center; margin-top: 0; }
+        label { display: block; margin: 10px 0 5px; font-size: 12px; color: #888; text-transform: uppercase; }
+        input, textarea { width: 100%; padding: 12px; background: var(--input); border: 1px solid #333; color: white; border-radius: 6px; box-sizing: border-box; }
+        input:focus { border-color: var(--verde); outline: none; }
+        button { width: 100%; padding: 15px; background: var(--verde); border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        button:hover { background: #1ba94c; }
+        #resultado { margin-top: 20px; width: 100%; background: #000; color: #22c55e; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 12px; white-space: pre-wrap; border: 1px solid #222; display: none; }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <h2>🚀 GERADOR DE JOGO</h2>
-    <input type="text" id="casa" placeholder="Nome Time Casa (Ex: Remo)">
-    <input type="text" id="l_casa" placeholder="Link Logo Casa (.png)">
-    <input type="text" id="fora" placeholder="Nome Time Fora (Ex: Paysandu)">
-    <input type="text" id="l_fora" placeholder="Link Logo Fora (.png)">
-    <input type="text" id="video" placeholder="Link do Vídeo (M3U8)">
-    <input type="text" id="pix" placeholder="Sua Chave PIX">
-    
-    <button onclick="gerar()">GERAR E COPIAR JSON</button>
-    <div id="output"></div>
-</div>
+    <div class="box">
+        <h2>⚽ GERADOR LIVEGOL</h2>
+        
+        <div style="display: flex; gap: 10px;">
+            <div style="flex: 1;">
+                <label>Time Casa:</label>
+                <input type="text" id="timeCasa" placeholder="Ex: Remo">
+            </div>
+            <div style="flex: 1;">
+                <label>Time Fora:</label>
+                <input type="text" id="timeFora" placeholder="Ex: Paysandu">
+            </div>
+        </div>
 
-<script>
-    function gerar() {
-        const dados = {
-            "timeCasa": document.getElementById('casa').value || "Time Casa",
-            "logoCasa": document.getElementById('l_casa').value || "https://via.placeholder.com/150",
-            "timeFora": document.getElementById('fora').value || "Time Fora",
-            "logoFora": document.getElementById('l_fora').value || "https://via.placeholder.com/150",
-            "linkVideo": document.getElementById('video').value.trim(),
-            "pix": document.getElementById('pix').value || "Chave Pix"
-        };
+        <label>URL Logo Casa (.png):</label>
+        <input type="text" id="logoCasa" placeholder="https://i.ibb.co/...">
 
-        const resultado = JSON.stringify(dados, null, 2);
-        document.getElementById('output').innerText = resultado;
-        document.getElementById('output').style.display = 'block';
+        <label>URL Logo Fora (.png):</label>
+        <input type="text" id="logoFora" placeholder="https://i.ibb.co/...">
 
-        navigator.clipboard.writeText(resultado).then(() => {
-            alert("JSON copiado! Agora cole no seu arquivo jogo.json e salve.");
-        });
-    }
-</script>
+        <label>Link do Vídeo (M3U8 ou TS):</label>
+        <input type="text" id="linkVideo" placeholder="http://servidor.online:80/live/...">
+
+        <label>Chave PIX:</label>
+        <input type="text" id="pix" placeholder="Sua chave copia e cola">
+
+        <button onclick="gerarJSON()">GERAR E COPIAR JSON</button>
+
+        <div id="resultado"></div>
+    </div>
+
+    <script>
+        function gerarJSON() {
+            const dados = {
+                timeCasa: document.getElementById('timeCasa').value || "Time Casa",
+                logoCasa: document.getElementById('logoCasa').value || "https://via.placeholder.com/150",
+                timeFora: document.getElementById('timeFora').value || "Time Fora",
+                logoFora: document.getElementById('logoFora').value || "https://via.placeholder.com/150",
+                linkVideo: document.getElementById('linkVideo').value,
+                pix: document.getElementById('pix').value || "Chave não informada"
+            };
+
+            const jsonFinal = JSON.stringify(dados, null, 2);
+            const areaResultado = document.getElementById('resultado');
+            
+            areaResultado.innerText = jsonFinal;
+            areaResultado.style.display = 'block';
+
+            // Copiar automaticamente
+            navigator.clipboard.writeText(jsonFinal).then(() => {
+                alert("JSON Gerado e Copiado! Agora cole no seu arquivo jogo.json lá no GitHub.");
+            });
+        }
+    </script>
 
 </body>
 </html>
