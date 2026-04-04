@@ -1,12 +1,8 @@
 {
-  "timeCasa": "",
-  "logoCasa": "",
-  "timeFora": "",
-  "logoFora": "",
-  "dataHora": " às ",
+  "timeCasa": "Time Casa",
+  "logoCasa": "https://via.placeholder.com/150",
+  "timeFora": "Time Fora",
+  "logoFora": "https://via.placeholder.com/150",
   "linkVideo": "https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8",
-  "pix": "",
-  "mensagemIncentivo": "⚽ O sinal depende do seu apoio! Colabore via PIX para manter a live no ar.",
-  "urlBanner": "",
-  "linkParceiro": ""
+  "pix": "Chave não informada"
 }
