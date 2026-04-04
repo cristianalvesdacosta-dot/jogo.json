@@ -8,124 +8,94 @@
     <style>
         :root { --verde: #22c55e; --fundo: #0a0a0a; }
         body { background: var(--fundo); color: #fff; font-family: sans-serif; margin: 0; text-align: center; }
-        .container { width: 100%; max-width: 450px; margin: auto; min-height: 100vh; display: flex; flex-direction: column; }
-        
+        .container { width: 100%; max-width: 450px; margin: auto; padding-bottom: 20px; }
         .header { padding: 15px; border-bottom: 2px solid var(--verde); background: #111; font-style: italic; }
-        h1 { margin: 0; font-size: 24px; }
-
-        /* Video Player */
-        .video-wrapper { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; }
-        video { width: 100%; height: 100%; display: block; }
-        #status { position: absolute; bottom: 10px; left: 10px; font-size: 11px; color: var(--verde); background: rgba(0,0,0,0.6); padding: 2px 8px; border-radius: 4px; }
-
-        /* Placar */
-        .placar { background: #111; margin: 15px; padding: 20px; border-radius: 12px; border: 1px solid #222; }
+        video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
+        .apoio { padding: 10px; font-size: 13px; color: var(--verde); background: rgba(34, 197, 94, 0.1); margin: 10px; border-radius: 5px; }
+        .placar { background: #111; margin: 10px; padding: 15px; border-radius: 12px; border: 1px solid #222; }
         .times { display: flex; justify-content: space-around; align-items: center; }
-        .time { width: 35%; }
-        .time img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 8px; }
-        .time p { margin: 0; font-weight: bold; font-size: 14px; text-transform: uppercase; }
-        .vs-box { text-align: center; }
-        .vs-text { color: var(--verde); font-weight: 900; font-size: 22px; }
-        .ao-vivo { background: var(--verde); color: #000; font-size: 10px; font-weight: 900; padding: 2px 6px; border-radius: 3px; margin-top: 5px; }
-
-        /* Botão Pix */
-        .footer { margin-top: auto; padding: 20px; }
-        .btn-pix { background: var(--verde); color: #000; border: none; padding: 18px; width: 100%; border-radius: 10px; font-weight: 900; font-size: 16px; cursor: pointer; transition: 0.2s; }
-        .btn-pix:active { transform: scale(0.95); }
+        .time img { width: 55px; height: 55px; object-fit: contain; }
+        .time p { font-size: 12px; font-weight: bold; margin: 5px 0; text-transform: uppercase; }
+        .vs { color: var(--verde); font-weight: 900; font-size: 18px; }
+        .banner-ads { margin: 10px; border-radius: 8px; overflow: hidden; display: none; border: 1px solid #333; }
+        .banner-ads img { width: 100%; display: block; }
+        .btn-pix { background: var(--verde); color: #000; border: none; padding: 18px; width: 90%; border-radius: 10px; font-weight: 900; font-size: 16px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header class="header"><h1>⚽ LIVE<span style="color:var(--verde)">GOL</span></h1></header>
-
-    <div class="video-wrapper">
-        <video id="video" controls autoplay playsinline></video>
-        <div id="status">Iniciando transmissão...</div>
-    </div>
-
+    <video id="video" controls autoplay playsinline></video>
+    <div id="status" style="font-size:11px; color:#666; padding:5px;">Conectando...</div>
+    <div class="apoio" id="msg_apoio"></div>
     <div class="placar">
         <div class="times">
-            <div class="time">
-                <img src="https://i.ibb.co/3Y7Xv3m/remo.png" id="img_c">
-                <p id="nome_c">REMO</p>
-            </div>
-
-            <div class="vs-box">
-                <div class="vs-text">VS</div>
-                <div class="ao-vivo">AO VIVO</div>
-            </div>
-
-            <div class="time">
-                <img src="https://i.ibb.co/L9Y0X8p/paysandu.png" id="img_f">
-                <p id="nome_f">PAYSANDU</p>
-            </div>
+            <div class="time"><img id="l_c"><p id="n_c"></p></div>
+            <div style="text-align:center;"><div class="vs">VS</div><div style="font-size:9px; background:var(--verde); color:#000; padding:2px; border-radius:3px;">AO VIVO</div></div>
+            <div class="time"><img id="l_f"><p id="n_f"></p></div>
         </div>
+        <div id="data_jogo" style="font-size:11px; color:#888; margin-top:10px;"></div>
     </div>
-
-    <div class="footer">
-        <button class="btn-pix" onclick="copiarPix()">APOIAR VIA PIX</button>
-    </div>
+    <div id="area_banner" class="banner-ads"><a id="link_banner" href="#" target="_blank"><img id="img_banner"></a></div>
+    <button class="btn-pix" onclick="copiarPix()">APOIAR VIA PIX</button>
 </div>
 
 <script>
-    // ==========================================
-    // CONFIGURAÇÃO MANUAL (EDITE AQUI)
-    // ==========================================
-    const CONFIG = {
-        timeCasa: "REMO",
-        logoCasa: "https://i.ibb.co/3Y7Xv3m/remo.png",
-        timeFora: "PAYSANDU",
-        logoFora: "https://i.ibb.co/L9Y0X8p/paysandu.png",
-        // COLE O LINK DO VÍDEO ABAIXO
-        linkVideo: "COLE_AQUI_O_LINK_M3U8", 
-        pix: "SUA_CHAVE_PIX_AQUI"
+    // ############################################################
+    // #        PAINEL DE EDIÇÃO - ALTERE OS DADOS ABAIXO         #
+    // ############################################################
+
+    const EDITAR_AQUI = {
+        timeCasa:    "REMO",                       // Nome do time 1
+        logoCasa:    "https://i.ibb.co/3Y7Xv3m/remo.png",  // Logo do time 1
+        
+        timeFora:    "PAYSANDU",                   // Nome do time 2
+        logoFora:    "https://i.ibb.co/L9Y0X8p/paysandu.png", // Logo do time 2
+        
+        dataHora:    "Hoje às 20:00",              // Data e Hora do jogo
+        fraseApoio:  "Fortaleça nossa live via PIX!", // Frase de incentivo
+        pix:         "SUA_CHAVE_AQUI",             // Sua chave PIX
+        
+        linkVideo:   "COLE_AQUI_O_LINK_M3U8",      // Link do sinal (M3U8)
+
+        bannerUrl:   "",                           // Link da imagem do Banner (se tiver)
+        linkBanner:  ""                            // Link que abre ao clicar no Banner
     };
 
-    // ==========================================
-    // LÓGICA DO PLAYER (NÃO MEXER)
-    // ==========================================
-    function iniciarApp() {
-        document.getElementById('nome_c').innerText = CONFIG.timeCasa;
-        document.getElementById('img_c').src = CONFIG.logoCasa;
-        document.getElementById('nome_f').innerText = CONFIG.timeFora;
-        document.getElementById('img_f').src = CONFIG.logoFora;
+    // ############################################################
+    // #      DAQUI PARA BAIXO NÃO PRECISA MEXER EM NADA          #
+    // ############################################################
 
-        const video = document.getElementById('video');
-        const status = document.getElementById('status');
-        
-        // Proxy para tentar pular bloqueio de Referer/CORS
-        const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(CONFIG.linkVideo);
+    function carregar() {
+        document.getElementById('n_c').innerText = EDITAR_AQUI.timeCasa;
+        document.getElementById('l_c').src = EDITAR_AQUI.logoCasa;
+        document.getElementById('n_f').innerText = EDITAR_AQUI.timeFora;
+        document.getElementById('l_f').src = EDITAR_AQUI.logoFora;
+        document.getElementById('data_jogo').innerText = EDITAR_AQUI.dataHora;
+        document.getElementById('msg_apoio').innerText = EDITAR_AQUI.fraseApoio;
+
+        if(EDITAR_AQUI.bannerUrl !== "") {
+            document.getElementById('area_banner').style.display = 'block';
+            document.getElementById('img_banner').src = EDITAR_AQUI.bannerUrl;
+            document.getElementById('link_banner').href = EDITAR_AQUI.linkBanner;
+        }
+
+        const v = document.getElementById('video');
+        const proxy = "https://api.allorigins.win/raw?url=" + encodeURIComponent(EDITAR_AQUI.linkVideo);
 
         if (Hls.isSupported()) {
-            const hls = new Hls({
-                xhrSetup: function(xhr) {
-                    xhr.withCredentials = false;
-                }
-            });
-            hls.loadSource(proxyUrl);
-            hls.attachMedia(video);
+            const hls = new Hls();
+            hls.loadSource(proxy);
+            hls.attachMedia(v);
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                status.innerText = "Sinal Estabilizado ✅";
-                video.play().catch(() => {
-                    status.innerText = "Clique no Play para assistir";
-                });
+                document.getElementById('status').innerText = "Sinal Online ✅";
+                v.play();
             });
-            hls.on(Hls.Events.ERROR, (event, data) => {
-                if(data.fatal) status.innerText = "Erro: Servidor bloqueou o site ❌";
-            });
-        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            video.src = proxyUrl;
         }
     }
-
-    function copiarPix() {
-        navigator.clipboard.writeText(CONFIG.pix);
-        alert("Chave PIX Copiada!");
-    }
-
-    window.onload = iniciarApp;
+    function copiarPix() { navigator.clipboard.writeText(EDITAR_AQUI.pix); alert("PIX Copiado!"); }
+    window.onload = carregar;
 </script>
-
 </body>
 </html>
