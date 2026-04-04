@@ -3,157 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LiveGol | Ao Vivo</title>
+    <title>LiveGol | Transmissão</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        :root { --verde: #22c55e; --fundo: #0a0a0a; --card: #171717; }
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--fundo); color: white; margin: 0; padding: 0; }
-        .container { width: 100%; max-width: 450px; margin: auto; min-height: 100vh; display: flex; flex-direction: column; background: #000; }
-        
-        /* Cabeçalho */
-        .header-banner { padding: 15px; text-align: center; background: #111; border-bottom: 2px solid var(--verde); display: flex; justify-content: center; align-items: center; gap: 8px; }
-        .logo-texto { font-size: 26px; font-weight: 900; font-style: italic; margin: 0; }
-        .cor-verde { color: var(--verde); }
-
-        /* Area do Video */
-        .video-box { width: 100%; background: #000; aspect-ratio: 16/9; border-bottom: 1px solid #222; }
-        video { width: 100%; height: 100%; display: block; }
-
-        /* Mensagem e Placar */
-        .apoio-box { padding: 12px; background: rgba(34, 197, 94, 0.1); margin: 10px 15px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.3); text-align: center; font-size: 13px; }
-
-        .placar { padding: 15px 10px; background: var(--card); margin: 5px 15px; border-radius: 12px; border: 1px solid #262626; }
-        .times-row { display: flex; justify-content: space-around; align-items: center; }
-        .time-bloco { width: 35%; text-align: center; }
-        .time-bloco img { width: 50px; height: 50px; object-fit: contain; }
-        .time-bloco p { font-weight: bold; font-size: 12px; margin: 5px 0 0 0; text-transform: uppercase; }
-        .vs-text { color: var(--verde); font-weight: 900; font-size: 18px; }
-        .live-tag { background: var(--verde); color: black; font-size: 9px; font-weight: 900; padding: 2px 5px; border-radius: 3px; margin-top: 4px; text-align: center; display: inline-block; }
-
-        /* Área de Banner (Ads) */
-        .ads-area { padding: 0 15px; margin: 10px 0; display: none; }
-        .ads-box { width: 100%; background: #111; border: 1px dashed #444; border-radius: 10px; overflow: hidden; text-align: center; }
-        .ads-box img { width: 100%; display: block; }
-
-        /* Rodapé com PIX */
-        .pix-area { margin-top: auto; padding: 20px; background: #111; border-top: 1px solid #262626; }
-        .btn-pix { background: var(--verde); color: black; border: none; padding: 18px; width: 100%; border-radius: 10px; font-weight: 900; font-size: 16px; cursor: pointer; transition: 0.2s; }
-        .btn-pix:active { transform: scale(0.95); }
+        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; text-align: center; }
+        .video-container { width: 100%; max-width: 500px; margin: auto; }
+        video { width: 100%; aspect-ratio: 16/9; background: #111; }
+        .btn-pix { background: #22c55e; border: none; padding: 15px; width: 90%; border-radius: 8px; font-weight: bold; margin-top: 20px; cursor: pointer; }
+        .placar-simples { padding: 20px; border: 1px solid #333; margin: 10px; border-radius: 10px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header class="header-banner">
-        <h1 class="logo-texto">⚽ LIVE<span class="cor-verde">GOL</span></h1>
-    </header>
-
-    <div class="video-box">
-        <video id="video" controls playsinline poster="https://via.placeholder.com/640x360/000000/FFFFFF?text=Carregando+Sinal..."></video>
-    </div>
+<div class="video-container">
+    <header style="padding:15px;"><h1>⚽ LIVE<span style="color:#22c55e">GOL</span></h1></header>
     
-    <div class="apoio-box">
-        <p id="texto_incentivo">Buscando sinal da partida...</p>
-    </div>
+    <video id="video" controls autoplay playsinline></video>
+    
+    <div id="status" style="font-size: 12px; color: #888; padding: 10px;">Conectando ao servidor...</div>
 
-    <div class="placar">
-        <div class="times-row">
-            <div class="time-bloco">
-                <img id="img_casa" src="">
-                <p id="nome_casa">CASA</p>
-            </div>
-            <div style="text-align: center;">
-                <div class="vs-text">VS</div>
-                <div class="live-tag">AO VIVO</div>
-            </div>
-            <div class="time-bloco">
-                <img id="img_fora" src="">
-                <p id="nome_fora">FORA</p>
-            </div>
-        </div>
-        <div id="data_hora_jogo" style="text-align:center; font-size:11px; color:#888; margin-top:10px;"></div>
-    </div>
-
-    <div id="container_ads" class="ads-area">
-        <div class="ads-box">
-            <a id="link_ads" href="#" target="_blank">
-                <img id="img_ads" src="" alt="Parceiro">
-            </a>
+    <div class="placar-simples">
+        <div style="display:flex; justify-content: space-around; align-items:center;">
+            <div><img id="img_c" width="40"><p id="t_c"></p></div>
+            <div style="color:#22c55e; font-weight:bold;">VS</div>
+            <div><img id="img_f" width="40"><p id="t_f"></p></div>
         </div>
     </div>
 
-    <div class="pix-area">
-        <button class="btn-pix" onclick="copiarPix()">APOIAR TRANSMISSÃO (PIX)</button>
-    </div>
+    <button class="btn-pix" onclick="copiarPix()">APOIAR VIA PIX</button>
 </div>
 
 <script>
-    // Link do seu JSON no GitHub
-    const JSON_URL = "https://raw.githubusercontent.com/cristianalvesdacosta-dot/jogo.json/main/jogo.json";
-
-    async function carregar() {
+    async function iniciar() {
+        const url_json = "https://raw.githubusercontent.com/cristianalvesdacosta-dot/jogo.json/main/jogo.json?v=" + Date.now();
+        
         try {
-            // Fetch com Cache Buster para atualizar sempre
-            const res = await fetch(`${JSON_URL}?v=${Date.now()}`);
-            const d = await res.json();
-            
-            // Preenche os dados do seu gerador
-            document.getElementById('nome_casa').innerText = d.timeCasa;
-            document.getElementById('img_casa').src = d.logoCasa;
-            document.getElementById('nome_fora').innerText = d.timeFora;
-            document.getElementById('img_fora').src = d.logoFora;
-            document.getElementById('data_hora_jogo').innerText = d.dataHora;
-            document.getElementById('texto_incentivo').innerText = d.mensagemIncentivo;
-            window.chavePix = d.pix;
+            const r = await fetch(url_json);
+            const d = await r.json();
 
-            // Banner de Parceria
-            if (d.urlBanner && d.urlBanner !== "") {
-                document.getElementById('container_ads').style.display = 'block';
-                document.getElementById('img_ads').src = d.urlBanner;
-                document.getElementById('link_ads').href = d.linkParceiro || "#";
-            }
-
-            // --- TRATAMENTO DO VÍDEO (BYPASS) ---
-            let link = d.linkVideo;
-            
-            // Se o link for HTTP (comum em IPTV), usamos o Proxy para não travar no GitHub HTTPS
-            if (link.startsWith("http://")) {
-                link = "https://api.allorigins.win/raw?url=" + encodeURIComponent(link);
-            }
+            document.getElementById('t_c').innerText = d.timeCasa;
+            document.getElementById('img_c').src = d.logoCasa;
+            document.getElementById('t_f').innerText = d.timeFora;
+            document.getElementById('img_f').src = d.logoFora;
+            window.pix = d.pix;
 
             const video = document.getElementById('video');
-            
+            let m3u8 = d.linkVideo;
+
+            // TESTE DE BYPASS 2: Usando o proxy de demonstração do Cloudflare
+            // Se o link original falhar, ele tenta camuflar a origem
+            const proxy_url = "https://api.allorigins.win/raw?url=" + encodeURIComponent(m3u8);
+
             if (Hls.isSupported()) {
                 const hls = new Hls({
-                    xhrSetup: function (xhr) {
-                        xhr.withCredentials = false;
-                    }
+                    enableWorker: true,
+                    lowLatencyMode: true,
+                    backBufferLength: 90
                 });
-                hls.loadSource(link);
+                
+                // Tentamos carregar via Proxy primeiro para garantir que o GitHub aceite
+                hls.loadSource(proxy_url);
                 hls.attachMedia(video);
                 
-                // Play automático (com mudo para o navegador permitir)
-                video.muted = true;
-                video.play().catch(() => console.log("Play automático aguardando interação."));
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    document.getElementById('status').innerText = "Sinal Estabilizado ✅";
+                    video.play();
+                });
 
-            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                // Suporte para iPhone/Safari
-                video.src = link;
+                hls.on(Hls.Events.ERROR, function (event, data) {
+                    if (data.details === 'manifestLoadError') {
+                        document.getElementById('status').innerText = "Erro: O servidor de IPTV bloqueou o site. ❌";
+                    }
+                });
             }
-
         } catch (e) {
-            console.error("Erro ao carregar dados:", e);
+            document.getElementById('status').innerText = "Erro ao ler o arquivo JSON.";
         }
     }
 
-    function copiarPix() { 
-        if (window.chavePix) {
-            navigator.clipboard.writeText(window.chavePix); 
-            alert("PIX Copiado com sucesso!"); 
-        }
-    }
-
-    carregar();
+    function copiarPix() { navigator.clipboard.writeText(window.pix); alert("Copiado!"); }
+    
+    iniciar();
 </script>
 
 </body>
