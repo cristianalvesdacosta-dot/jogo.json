@@ -3,89 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LiveGol | Ao Vivo</title>
+    <title>LiveGol | Oficial</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; margin: 0; text-align: center; }
         .container { width: 100%; max-width: 450px; margin: auto; }
-        .header { padding: 15px; border-bottom: 2px solid #22c55e; background: #111; }
+        .header { padding: 15px; border-bottom: 2px solid #22c55e; background: #111; font-style: italic; }
         video { width: 100%; aspect-ratio: 16/9; background: #111; display: block; }
         .placar { background: #111; margin: 15px; padding: 20px; border-radius: 12px; border: 1px solid #222; }
         .times { display: flex; justify-content: space-around; align-items: center; }
-        .time img { width: 60px; height: 60px; object-fit: contain; background: #222; border-radius: 5px; }
+        .time img { width: 60px; height: 60px; object-fit: contain; }
         .vs { color: #22c55e; font-weight: 900; font-size: 20px; }
         .btn-pix { background: #22c55e; color: #000; border: none; padding: 18px; width: 90%; border-radius: 10px; font-weight: 900; font-size: 16px; margin-top: 20px; cursor: pointer; }
-        #status { font-size: 12px; color: #ff4444; padding: 10px; }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <header class="header"><h1>⚽ LIVE<span style="color:#22c55e">GOL</span></h1></header>
-    
-    <video id="video" controls autoplay playsinline></video>
-    <div id="status">Verificando sinal...</div>
-
-    <div class="placar">
-        <div class="times">
-            <div><img id="logo_c"><p id="nome_c">---</p></div>
-            <div><div class="vs">VS</div><div style="background:#22c55e;color:#000;font-size:10px;padding:2px 5px;border-radius:3px;font-weight:900;">AO VIVO</div></div>
-            <div><img id="logo_f"><p id="nome_f">---</p></div>
+    <div class="container">
+        <header class="header"><h1>⚽ LIVE<span style="color:#22c55e">GOL</span></h1></header>
+        <video id="video" controls autoplay playsinline></video>
+        <div id="status" style="padding:10px; font-size:12px; color:#888;">Carregando...</div>
+        <div class="placar">
+            <div class="times">
+                <div><img id="l_c"><p id="n_c">---</p></div>
+                <div><div class="vs">VS</div></div>
+                <div><img id="l_f"><p id="n_f">---</p></div>
+            </div>
         </div>
-        <div id="data" style="margin-top:15px; color:#888; font-size:12px;"></div>
+        <button class="btn-pix" onclick="navigator.clipboard.writeText(window.px);alert('Copiado!')">APOIAR VIA PIX</button>
     </div>
 
-    <button class="btn-pix" onclick="copiarPix()">APOIAR VIA PIX</button>
-</div>
-
 <script>
-    const URL_JSON = "https://raw.githubusercontent.com/cristianalvesdacosta-dot/jogo.json/main/jogo.json";
-
     async function carregar() {
+        const url = "https://raw.githubusercontent.com/cristianalvesdacosta-dot/jogo.json/main/jogo.json?v=" + Date.now();
         try {
-            const res = await fetch(URL_JSON + "?v=" + Date.now());
-            const d = await res.json();
+            const r = await fetch(url);
+            const d = await r.json();
+            
+            document.getElementById('n_c').innerText = d.timeCasa;
+            document.getElementById('l_c').src = d.logoCasa;
+            document.getElementById('n_f').innerText = d.timeFora;
+            document.getElementById('l_f').src = d.logoFora;
+            window.px = d.pix;
 
-            // Preenchimento dos dados
-            document.getElementById('nome_c').innerText = d.timeCasa;
-            document.getElementById('logo_c').src = d.logoCasa;
-            document.getElementById('nome_f').innerText = d.timeFora;
-            document.getElementById('logo_f').src = d.logoFora;
-            document.getElementById('data').innerText = d.dataHora;
-            window.pix = d.pix;
-
-            const video = document.getElementById('video');
             let sinal = d.linkVideo;
-
-            // Se o sinal for HTTP, usamos o Proxy para o GitHub não bloquear
-            if (sinal.startsWith("http://")) {
-                sinal = "https://api.allorigins.win/raw?url=" + encodeURIComponent(sinal);
-            }
-
+            // Bypass para o GitHub
+            const proxy = "https://api.allorigins.win/raw?url=" + encodeURIComponent(sinal);
+            
+            const v = document.getElementById('video');
             if (Hls.isSupported()) {
                 const hls = new Hls();
-                hls.loadSource(sinal);
-                hls.attachMedia(video);
+                hls.loadSource(proxy);
+                hls.attachMedia(v);
                 hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    document.getElementById('status').innerText = "Sinal Conectado! ✅";
-                    document.getElementById('status').style.color = "#22c55e";
-                    video.play();
+                    document.getElementById('status').innerText = "Sinal Online ✅";
+                    v.play();
                 });
-                hls.on(Hls.Events.ERROR, () => {
-                    document.getElementById('status').innerText = "Erro: O servidor de IPTV bloqueou o site. ❌";
-                });
-            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = sinal;
             }
         } catch (e) {
-            document.getElementById('status').innerText = "Erro ao carregar o arquivo jogo.json ❌";
+            document.getElementById('status').innerText = "Erro no arquivo jogo.json! Verifique as vírgulas.";
         }
     }
-
-    function copiarPix() { navigator.clipboard.writeText(window.pix); alert("PIX Copiado!"); }
-    
     carregar();
 </script>
-
 </body>
 </html>
