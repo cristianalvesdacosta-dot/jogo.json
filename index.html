@@ -3,99 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LiveGol | Oficial</title>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <title>Mundo Futuro - Gerador de Shorts</title>
     <style>
-        :root { --verde: #22c55e; --fundo: #0a0a0a; }
-        body { background: var(--fundo); color: #fff; font-family: sans-serif; margin: 0; text-align: center; }
-        .container { width: 100%; max-width: 450px; margin: auto; padding-bottom: 20px; }
-        .header { padding: 15px; border-bottom: 2px solid var(--verde); background: #111; font-style: italic; }
-        video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
-        .apoio { padding: 10px; font-size: 13px; color: var(--verde); background: rgba(34, 197, 94, 0.1); margin: 10px; border-radius: 5px; }
-        .placar { background: #111; margin: 10px; padding: 15px; border-radius: 12px; border: 1px solid #222; }
-        .times { display: flex; justify-content: space-around; align-items: center; }
-        .time img { width: 55px; height: 55px; object-fit: contain; }
-        .time p { font-size: 12px; font-weight: bold; margin: 5px 0; text-transform: uppercase; }
-        .vs { color: var(--verde); font-weight: 900; font-size: 18px; }
-        .banner-ads { margin: 10px; border-radius: 8px; overflow: hidden; display: none; border: 1px solid #333; }
-        .banner-ads img { width: 100%; display: block; }
-        .btn-pix { background: var(--verde); color: #000; border: none; padding: 18px; width: 90%; border-radius: 10px; font-weight: 900; font-size: 16px; cursor: pointer; }
+        :root { --primary: #00d2ff; --bg: #0b0e14; --card: #161b22; --text: #e6edf3; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 20px; max-width: 900px; margin: auto; line-height: 1.6; }
+        .card { background: var(--card); padding: 25px; border-radius: 15px; border: 1px solid #30363d; margin-bottom: 20px; }
+        h1 { color: var(--primary); text-align: center; font-size: 1.8rem; text-transform: uppercase; letter-spacing: 2px; }
+        input { width: 100%; padding: 15px; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; margin-bottom: 15px; box-sizing: border-box; }
+        button { padding: 12px 24px; border-radius: 8px; border: none; background: var(--primary); color: #000; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; margin-bottom: 10px; }
+        button:hover { opacity: 0.8; transform: translateY(-2px); }
+        .btn-copy { background: #238636; color: white; width: auto; font-size: 12px; padding: 5px 10px; margin-top: 5px; }
+        .output-section { display: none; animation: fadeIn 0.5s; }
+        .script-box { background: #0d1117; padding: 15px; border-radius: 8px; border-left: 4px solid var(--primary); margin-bottom: 15px; }
+        pre { background: #000; padding: 15px; border-radius: 8px; color: #58a6ff; white-space: pre-wrap; font-size: 14px; border: 1px dashed #30363d; }
+        .history-item { border-bottom: 1px solid #30363d; padding: 15px 0; }
+        .tag { font-size: 10px; color: var(--primary); font-weight: bold; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header class="header"><h1>⚽ LIVE<span style="color:var(--verde)">GOL</span></h1></header>
-    <video id="video" controls autoplay playsinline></video>
-    <div id="status" style="font-size:11px; color:#666; padding:5px;">Conectando...</div>
-    <div class="apoio" id="msg_apoio"></div>
-    <div class="placar">
-        <div class="times">
-            <div class="time"><img id="l_c"><p id="n_c"></p></div>
-            <div style="text-align:center;"><div class="vs">VS</div><div style="font-size:9px; background:var(--verde); color:#000; padding:2px; border-radius:3px;">AO VIVO</div></div>
-            <div class="time"><img id="l_f"><p id="n_f"></p></div>
-        </div>
-        <div id="data_jogo" style="font-size:11px; color:#888; margin-top:10px;"></div>
+    <h1>🚀 Mundo Futuro: Studio</h1>
+    
+    <div class="card">
+        <label>Qual o tema do futuro hoje?</label>
+        <input type="text" id="tema" placeholder="Ex: Cidades flutuantes, Robôs garçons, Marte..." onkeypress="if(event.key==='Enter') gerarTudo()">
+        <button onclick="gerarTudo()">GERAR ESTRUTURA DE VÍDEO</button>
     </div>
-    <div id="area_banner" class="banner-ads"><a id="link_banner" href="#" target="_blank"><img id="img_banner"></a></div>
-    <button class="btn-pix" onclick="copiarPix()">APOIAR VIA PIX</button>
-</div>
 
-<script>
-    // ############################################################
-    // #        PAINEL DE EDIÇÃO - ALTERE OS DADOS ABAIXO         #
-    // ############################################################
+    <div id="result" class="output-section">
+        <div class="card">
+            <h3>🤖 Prompt para o GROK (Vídeo 10s)</h3>
+            <p style="font-size: 13px; color: #8b949e;">Copie este comando e cole no Grok para gerar a imagem/vídeo:</p>
+            <pre id="promptGrok"></pre>
+            <button class="btn-copy" onclick="copy('promptGrok')">Copiar Prompt</button>
 
-    const EDITAR_AQUI = {
-        timeCasa:    "REMO",                       // Nome do time 1
-        logoCasa:    "https://raw.githubusercontent.com/cristianalvesdacosta-dot/jogo.json/0823f9dc65aa5ad0cc94741ae30f4f6b51ea3c2a/logos/Clube_do_Remo.svg.png",  // Logo do time 1
-        
-        timeFora:    "GRÊMIO",                   // Nome do time 2
-        logoFora:    "https://raw.githubusercontent.com/cristianalvesdacosta-dot/jogo.json/refs/heads/main/logos/Gremio_logo.svg.png", // Logo do time 2
-        
-        dataHora:    "Hoje às 20:30",              // Data e Hora do jogo
-        fraseApoio:  "Fortaleça nossa live via PIX!", // Frase de incentivo
-        pix:         "c09be774-91cc-421f-8cd7-23d8a28d4a07",             // Sua chave PIX
-        
-        linkVideo:   "http://pplay.top:80/85843686/68815994/411139.m3u8",      // Link do sinal (M3U8)
+            <hr style="border: 0; border-top: 1px solid #30363d; margin: 20px 0;">
 
-        bannerUrl:   "",                           // Link da imagem do Banner (se tiver)
-        linkBanner:  ""                            // Link que abre ao clicar no Banner
-    };
+            <h3>🎬 Opções de Legenda (Português)</h3>
+            <div class="script-box">
+                <strong>Opção 1 (Curiosidade):</strong> <span id="opt1"></span>
+                <button class="btn-copy" onclick="copy('opt1')">Copiar</button>
+            </div>
+            <div class="script-box">
+                <strong>Opção 2 (Impacto):</strong> <span id="opt2"></span>
+                <button class="btn-copy" onclick="copy('opt2')">Copiar</button>
+            </div>
+            <div class="script-box">
+                <strong>Opção 3 (Loop Infinito):</strong> <span id="opt3"></span>
+                <button class="btn-copy" onclick="copy('opt3')">Copiar</button>
+            </div>
+        </div>
+    </div>
 
-    // ############################################################
-    // #      DAQUI PARA BAIXO NÃO PRECISA MEXER EM NADA          #
-    // ############################################################
+    <div class="card">
+        <h3>📂 Histórico de Produção</h3>
+        <div id="historyList"></div>
+    </div>
 
-    function carregar() {
-        document.getElementById('n_c').innerText = EDITAR_AQUI.timeCasa;
-        document.getElementById('l_c').src = EDITAR_AQUI.logoCasa;
-        document.getElementById('n_f').innerText = EDITAR_AQUI.timeFora;
-        document.getElementById('l_f').src = EDITAR_AQUI.logoFora;
-        document.getElementById('data_jogo').innerText = EDITAR_AQUI.dataHora;
-        document.getElementById('msg_apoio').innerText = EDITAR_AQUI.fraseApoio;
+    <script>
+        function gerarTudo() {
+            const tema = document.getElementById('tema').value;
+            if (!tema) return alert("Digite um tema primeiro!");
 
-        if(EDITAR_AQUI.bannerUrl !== "") {
-            document.getElementById('area_banner').style.display = 'block';
-            document.getElementById('img_banner').src = EDITAR_AQUI.bannerUrl;
-            document.getElementById('link_banner').href = EDITAR_AQUI.linkBanner;
+            // 1. Gerar Prompt em Inglês para o Grok
+            const prompt = `Cinematic 10-second video, hyper-realistic 3D render, futuristic version of ${tema}, high detail, 8k resolution, neon lighting, smooth camera movement, masterpiece, science fiction aesthetic.`;
+            
+            // 2. Gerar 3 variações de roteiro em Português
+            const scripts = {
+                v1: `Você já imaginou como será ${tema.toLowerCase()} no futuro? A tecnologia está mudando tudo.`,
+                v2: `O futuro chegou! É assim que ${tema.toLowerCase()} deve ser daqui a 50 anos. Surreal, né?`,
+                v3: `${tema.toUpperCase()} no futuro será exatamente assim. E você, moraria aqui? Porque eu...`
+            };
+
+            // Exibir na tela
+            document.getElementById('promptGrok').innerText = prompt;
+            document.getElementById('opt1').innerText = scripts.v1;
+            document.getElementById('opt2').innerText = scripts.v2;
+            document.getElementById('opt3').innerText = scripts.v3;
+            document.getElementById('result').style.display = "block";
+
+            salvarHistorico(tema, prompt);
         }
 
-        const v = document.getElementById('video');
-        const proxy = "https://api.allorigins.win/raw?url=" + encodeURIComponent(EDITAR_AQUI.linkVideo);
-
-        if (Hls.isSupported()) {
-            const hls = new Hls();
-            hls.loadSource(proxy);
-            hls.attachMedia(v);
-            hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                document.getElementById('status').innerText = "Sinal Online ✅";
-                v.play();
-            });
+        function copy(id) {
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text);
+            alert("Copiado com sucesso!");
         }
-    }
-    function copiarPix() { navigator.clipboard.writeText(EDITAR_AQUI.pix); alert("PIX Copiado!"); }
-    window.onload = carregar;
-</script>
+
+        function salvarHistorico(tema, prompt) {
+            let lista = JSON.parse(localStorage.getItem('historicoMundoFuturo')) || [];
+            lista.unshift({ tema, prompt, data: new Date().toLocaleString() });
+            if(lista.length > 10) lista.pop(); // Mantém os últimos 10
+            localStorage.setItem('historicoMundoFuturo', JSON.stringify(lista));
+            renderHistorico();
+        }
+
+        function renderHistorico() {
+            const lista = JSON.parse(localStorage.getItem('historicoMundoFuturo')) || [];
+            document.getElementById('historyList').innerHTML = lista.map(h => `
+                <div class="history-item">
+                    <span class="tag">${h.data}</span><br>
+                    <strong>${h.tema}</strong>
+                </div>
+            `).join('');
+        }
+
+        renderHistorico();
+    </script>
 </body>
 </html>
