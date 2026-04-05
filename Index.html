@@ -1,1 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <title>Moto Assistente Pro</title>
+    <style>
+        :root {
+            --primary: #fbbf24;
+            --bg: #111827;
+            --card: #1f2937;
+            --text: #f3f4f6;
+            --success: #22c55e;
+            --danger: #ef4444;
+        }
 
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 10px;
+            padding-bottom: 30px;
+        }
+
+        h2, h3 { color: var(--primary); margin-top: 5px; margin-bottom: 10px; }
+
+        .card {
+            background: var(--card);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+
+        label { font-size: 0.85em; color: #9ca3af; margin-left: 5px; }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 6px 0 12px 0;
+            border-radius: 8px;
+            border: 1px solid #374151;
+            background: #374151;
+            color: white;
+            font-size: 16px; /* Evita zoom automático no iPhone */
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 5px;
+            transition: opacity 0.2s;
+        }
+
+        button:active { opacity: 0.7; }
+
+        .btn-save { background-color: var(--success); color: white; }
+        .btn-calc { background-color: var(--primary); color: #000; }
+        .btn-maps { background-color: #3b82f6; color: white; }
+
+        .result-box {
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .progress-container {
+            background: #374151;
+            border-radius: 20px;
+            height: 20px;
+            width: 100%;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            background: linear-gradient(90deg, #fbbf24, #22c55e);
+            height: 100%;
+            width: 0%;
+            transition: width 0.6s ease-in-out;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 8px;
+            border-bottom: 1px solid #374151;
+        }
+
+        .delete-btn { 
+            background: #ef4444; 
+            color: white; 
+            padding: 5px 10px; 
+            border-radius: 5px; 
+            font-size: 12px; 
+            width: auto; 
+            margin: 0;
+        }
+
+        .custo-km-badge {
+            background: #111827;
+            padding: 5px 10px;
+            border-radius: 5px;
+            border-left: 3px solid var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Moto Assistente 🏍️</h2>
+
+    <div class="card">
+        <h3>Configuração</h3>
+        <label>Tanque (Litros)</label>
+        <input type="number" id="tanque" value="16" oninput="atualizarCustoKm()">
+        <label>Consumo (KM por Litro)</label>
+        <input type="number" id="consumo" value="35" oninput="atualizarCustoKm()">
+        <label>Preço do Litro (R$)</label>
+        <input type="number" id="precoLitro" value="5.80" oninput="atualizarCustoKm()">
+        <div class="custo-km-badge">
+            Custo Real por KM: <strong>R$ <span id="custoKm">0.00</span></strong>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Nova Corrida</h3>
+        <input type="number" id="valorCorrida" inputmode="decimal" placeholder="Valor que o App paga (R$)">
+        <input type="number" id="kmCorrida" inputmode="decimal" placeholder="KM total (Até o cliente + destino)">
+        <button class="btn-calc" onclick="simularCorrida()">Analisar Corrida</button>
+        <div id="feedback" class="result-box"></div>
+        <button class="btn-save" id="btnSalvar" style="display:none;" onclick="salvarCorrida()">Aceitar e Registrar</button>
+    </div>
+
+    <div class="card">
+        <h3>GPS (Destino Manual)</h3>
+        <input type="text" id="destino" placeholder="Rua, Número, Bairro...">
+        <button class="btn-maps" onclick="abrirMaps()">Traçar Rota no Maps</button>
+    </div>
+
+    <div class="card">
+        <h3>Meta e Ganhos</h3>
+        <label>Meta do Dia (R$)</label>
+        <input type="number" id="metaDiaria" value="200" oninput="renderizarMeta()">
+        
+        <div class="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+        <p>Total Acumulado: <strong>R$ <span id="totalGanhos">0.00</span></strong></p>
+        
+        <div id="historico" style="max-height: 300px; overflow-y: auto;">
+            </div>
+        
+        <button onclick="limparTudo()" style="background:none; color: #6b7280; font-size: 0.8em; margin-top: 20px;">Limpar Ganhos do Dia</button>
+    </div>
+
+    <script>
+        let corridas = JSON.parse(localStorage.getItem('corridas')) || [];
+        let custoPorKm = 0;
+
+        function atualizarCustoKm() {
+            const consumo = document.getElementById('consumo').value;
+            const preco = document.getElementById('precoLitro').value;
+            custoPorKm = preco / consumo;
+            document.getElementById('custoKm').innerText = custoPorKm.toFixed(2);
+            
+            localStorage.setItem('config_moto', JSON.stringify({
+                tanque: document.getElementById('tanque').value,
+                consumo,
+                preco
+            }));
+        }
+
+        function simularCorrida() {
+            const valor = parseFloat(document.getElementById('valorCorrida').value);
+            const km = parseFloat(document.getElementById('kmCorrida').value);
+            const feedback = document.getElementById('feedback');
+            const btnSalvar = document.getElementById('btnSalvar');
+
+            if (!valor || !km) return;
+
+            const gasto = km * custoPorKm;
+            const lucro = valor - gasto;
+            const porcentagemLucro = (lucro / valor) * 100;
+
+            feedback.style.display = 'block';
+            if (lucro > 0 && porcentagemLucro > 40) {
+                feedback.innerHTML = `VALE A PENA! <br> Lucro Limpo: R$ ${lucro.toFixed(2)}`;
+                feedback.style.backgroundColor = '#065f46';
+                feedback.style.color = '#fff';
+            } else {
+                feedback.innerHTML = `LUCRO BAIXO! <br> Sobra apenas R$ ${lucro.toFixed(2)}`;
+                feedback.style.backgroundColor = '#991b1b';
+                feedback.style.color = '#fff';
+            }
+            btnSalvar.style.display = 'block';
+        }
+
+        function salvarCorrida() {
+            const valor = parseFloat(document.getElementById('valorCorrida').value);
+            const km = parseFloat(document.getElementById('kmCorrida').value);
+            
+            const novaCorrida = {
+                id: Date.now(),
+                valor: valor,
+                km: km,
+                data: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            };
+
+            corridas.push(novaCorrida);
+            localStorage.setItem('corridas', JSON.stringify(corridas));
+            
+            // Limpar campos
+            document.getElementById('valorCorrida').value = '';
+            document.getElementById('kmCorrida').value = '';
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('btnSalvar').style.display = 'none';
+            
+            renderizarMeta();
+        }
+
+        function renderizarMeta() {
+            const meta = parseFloat(document.getElementById('metaDiaria').value) || 1;
+            const total = corridas.reduce((acc, curr) => acc + curr.valor, 0);
+            const perc = (total / meta) * 100;
+
+            document.getElementById('totalGanhos').innerText = total.toFixed(2);
+            document.getElementById('progress-bar').style.width = Math.min(perc, 100) + '%';
+            
+            const histDiv = document.getElementById('historico');
+            histDiv.innerHTML = '<h4 style="margin-bottom:5px">Últimas Corridas</h4>';
+            
+            // Mostra as mais recentes primeiro
+            [...corridas].reverse().forEach(c => {
+                histDiv.innerHTML += `
+                    <div class="history-item">
+                        <span><strong>${c.data}</strong>: R$ ${c.valor.toFixed(2)} (${c.km}km)</span>
+                        <button class="delete-btn" onclick="removerCorrida(${c.id})">Apagar</button>
+                    </div>
+                `;
+            });
+        }
+
+        function removerCorrida(id) {
+            corridas = corridas.filter(c => c.id !== id);
+            localStorage.setItem('corridas', JSON.stringify(corridas));
+            renderizarMeta();
+        }
+
+        function abrirMaps() {
+            const destino = document.getElementById('destino').value;
+            if(destino) {
+                // Link otimizado para abrir App do Maps no Android/iOS
+                window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destino)}&travelmode=motorcycle`, '_blank');
+            }
+        }
+
+        function limparTudo() {
+            if(confirm("Deseja zerar o histórico de hoje?")) {
+                corridas = [];
+                localStorage.removeItem('corridas');
+                renderizarMeta();
+            }
+        }
+
+        window.onload = () => {
+            const config = JSON.parse(localStorage.getItem('config_moto'));
+            if(config) {
+                document.getElementById('tanque').value = config.tanque;
+                document.getElementById('consumo').value = config.consumo;
+                document.getElementById('precoLitro').value = config.preco;
+            }
+            atualizarCustoKm();
+            renderizarMeta();
+        };
+    </script>
+</body>
+</html>
